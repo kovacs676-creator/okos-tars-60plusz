@@ -1,0 +1,486 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0" />
+  <title>OkosTárs 60+ – Mobilra Optimalizált Magyar AI Oktató és Valódi AI Segéd</title>
+  <meta name="description" content="Senior-barát, mobiltelefonra is optimalizált, magyar viszonyokra (EESZT, MVM, MÁV 65+, magyar városok) szabott interaktív mesterséges intelligencia oktató, szimulátor és valódi élő AI-kliens." />
+  <link rel="stylesheet" href="index.css" />
+</head>
+<body>
+
+  <div id="app-shell">
+
+    <header class="site-header no-print">
+      <div class="container header-top">
+        <div class="brand">
+          <button class="brand-badge" onclick="switchSection('home')" aria-label="Kezdőlap">60+</button>
+          <div>
+            <h1>OkosTárs 60+</h1>
+            <p id="profile-summary-badge">📍 Budapest • Android • Szimulátor + 1-kattintásos AI</p>
+          </div>
+        </div>
+
+        <div class="toolbar" role="toolbar" aria-label="Olvasási és személyre szabási eszközök">
+          <button id="btn-font-normal" class="btn btn-compact" onclick="setFontSize('normal')">A</button>
+          <button id="btn-font-large" class="btn btn-compact btn-primary" onclick="setFontSize('large')">A+</button>
+          <button id="btn-font-xlarge" class="btn btn-compact" onclick="setFontSize('xlarge')">A++</button>
+          <button id="btn-contrast" class="btn btn-compact btn-secondary" onclick="toggleHighContrast()">👁️</button>
+          <button id="btn-mobile-preview" class="btn btn-compact btn-secondary" onclick="toggleMobilePreviewMode()">
+            📱 <span id="mobile-preview-label">Mobil nézet</span>
+          </button>
+          <button id="btn-toggle-settings" class="btn btn-compact btn-primary" onclick="toggleSettingsDrawer()">⚙️ Profil &amp; AI</button>
+          <button id="btn-mobile-chapters" class="btn btn-compact btn-primary mobile-menu-trigger" onclick="toggleMobileChapterDrawer()">☰ Témák</button>
+        </div>
+      </div>
+
+      <!-- Mobilos Lenyíló 2-oszlopos Témaválasztó -->
+      <div id="mobile-chapter-drawer" class="mobile-chapter-drawer hidden">
+        <div style="display:flex;justify-content:space-between;align-items:center;">
+          <strong style="font-size:0.8rem;">Válasszon fejezetet (érintse meg):</strong>
+          <button class="btn btn-compact" onclick="toggleMobileChapterDrawer()">✕ Bezár</button>
+        </div>
+        <div class="mobile-chapter-grid">
+          <button class="btn" onclick="switchSection('home')">🏠 1. Alapok</button>
+          <button class="btn" onclick="switchSection('health')">🩺 2. Egészség</button>
+          <button class="btn" onclick="switchSection('kitchen')">🍲 3. Konyha &amp; Kert</button>
+          <button class="btn" onclick="switchSection('admin')">✉️ 4. Ügyintézés</button>
+          <button class="btn" onclick="switchSection('safety')">🛡️ 5. Csalásszűrő</button>
+          <button class="btn" onclick="switchSection('leisure')">👨‍👩‍👧‍👦 6. Család &amp; Mese</button>
+          <button class="btn btn-primary" onclick="switchSection('simulator')">💬 7. AI Szoba</button>
+          <button class="btn" onclick="switchSection('realtools')">📱 8. Készülék &amp; Puska</button>
+        </div>
+      </div>
+
+      <!-- Lehajtható Beállító Panel -->
+      <div id="settings-drawer" class="settings-drawer hidden">
+        <div class="container">
+          <div class="grid-2">
+            <div class="card">
+              <h3 style="margin-top:0;">📍 1. Személyre szabás és Magyar Lokalizáció</h3>
+              <div style="display:grid;gap:0.65rem;">
+                <div>
+                  <label for="prof-name"><strong>Hogyan szólíthatjuk Önt?</strong></label>
+                  <input id="prof-name" class="form-control" type="text" value="Kedves Látogató" placeholder="Pl. Éva néni, János bácsi, Kati" />
+                </div>
+                <div>
+                  <label for="prof-city"><strong>Város / Régió:</strong></label>
+                  <select id="prof-city" class="form-control" onchange="handleCityPresetChange()">
+                    <option value="Budapest">Budapest és környéke</option>
+                    <option value="Debrecen">Debrecen és Hajdú-Bihar</option>
+                    <option value="Szeged">Szeged és Csongrád-Csanád</option>
+                    <option value="Miskolc">Miskolc és Borsod</option>
+                    <option value="Pécs">Pécs és Baranya</option>
+                    <option value="Győr">Győr és Kisalföld</option>
+                    <option value="Székesfehérvár">Székesfehérvár és Fejér</option>
+                    <option value="Kecskemét">Kecskemét és Bács-Kiskun</option>
+                    <option value="Nyíregyháza">Nyíregyháza és Szabolcs</option>
+                    <option value="Szombathely">Szombathely és Vas</option>
+                    <option value="Veszprém">Veszprém és Balaton-felvidék</option>
+                    <option value="Eger">Eger és Heves</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="prof-custom-city"><strong>Vagy írja be saját települését:</strong></label>
+                  <input id="prof-custom-city" class="form-control" type="text" placeholder="Pl. Gödöllő, Gyula, Keszthely..." />
+                </div>
+                <div>
+                  <label for="prof-device"><strong>Használt készülék:</strong></label>
+                  <select id="prof-device" class="form-control">
+                    <option value="android">📱 Android okostelefon (Samsung, Xiaomi)</option>
+                    <option value="iphone">🍏 iPhone / iPad</option>
+                    <option value="windows">💻 Windows Számítógép / Laptop</option>
+                  </select>
+                </div>
+                <button class="btn btn-primary" onclick="saveUserProfile()">💾 Profil mentése és helyi példák frissítése</button>
+              </div>
+            </div>
+
+            <div class="card">
+              <h3 style="margin-top:0;">⚡ 2. Valódi Élő AI-Kapcsolat (Gemini / ChatGPT)</h3>
+              <div style="display:grid;gap:0.65rem;">
+                <div>
+                  <label for="ai-mode-select"><strong>Működési mód a Gyakorló Szobában:</strong></label>
+                  <select id="ai-mode-select" class="form-control">
+                    <option value="simulator">🛡️ Beépített Okos Szimulátor (Ingyenes, kulcs nélkül)</option>
+                    <option value="gemini">✨ Valódi Élő Google Gemini AI (Gemini API-kulccsal)</option>
+                    <option value="openai">🤖 Valódi Élő OpenAI ChatGPT (OpenAI API-kulccsal)</option>
+                  </select>
+                </div>
+                <div>
+                  <label for="ai-api-key"><strong>API-kulcs (csak a saját böngészőjében tárolódik):</strong></label>
+                  <input id="ai-api-key" class="form-control" type="password" placeholder="AIzaSy... vagy sk-..." />
+                </div>
+                <div class="action-row">
+                  <button class="btn btn-primary" onclick="saveAiConfig()">💾 AI-kapcsolat mentése</button>
+                  <button class="btn btn-secondary" onclick="testLiveAiConnection()">🔌 Kapcsolat tesztelése</button>
+                </div>
+                <div id="ai-test-feedback" style="font-size:0.8rem;font-weight:600;color:var(--text-muted);"></div>
+                <p style="font-size:0.8rem;color:var(--text-muted);margin:0;">
+                  💡 <strong>API-kulcs nélkül is használhat valódi AI-t!</strong> Minden sablonnál és a gyakorlóban is ott a <strong>„🚀 ChatGPT”</strong> gomb, amely telefonon is egyetlen érintéssel átviszi a magyar kérdést a valódi, ingyenes ChatGPT-be.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Asztali Főmenü (Mobilon elrejtve) -->
+      <nav class="nav-bar desktop-only-nav" aria-label="Főmenü">
+        <div class="container nav-list">
+          <button id="nav-home" class="btn btn-primary" onclick="switchSection('home')">🏠 1. Alapok &amp; Helyi Tippek</button>
+          <button id="nav-health" class="btn" onclick="switchSection('health')">🩺 2. Egészség (EESZT)</button>
+          <button id="nav-home-kitchen" class="btn" onclick="switchSection('kitchen')">🍲 3. Konyha &amp; Kert</button>
+          <button id="nav-admin" class="btn" onclick="switchSection('admin')">✉️ 4. Magyar Ügyintézés</button>
+          <button id="nav-safety" class="btn" onclick="switchSection('safety')">🛡️ 5. Csalásszűrő</button>
+          <button id="nav-leisure" class="btn" onclick="switchSection('leisure')">👨‍👩‍👧‍👦 6. Család &amp; 65+ Utazás</button>
+          <button id="nav-simulator" class="btn" onclick="switchSection('simulator')">💬 7. Gyakorló &amp; Élő AI</button>
+          <button id="nav-realtools" class="btn" onclick="switchSection('realtools')">📱 8. Saját Készülék &amp; Puska</button>
+        </div>
+      </nav>
+    </header>
+
+    <div id="toast-banner" class="toast hidden no-print" role="status" aria-live="polite">
+      <span id="toast-text">Sikeres művelet!</span>
+    </div>
+
+    <main class="container section-stack">
+
+      <!-- Személyre szabott üdvözlő és felolvasó sáv -->
+      <div class="welcome-bar no-print">
+        <div>
+          <div id="welcome-banner-title" style="font-weight:700;">
+            Jó napot kívánok! Itt semmit sem tud elrontani vagy véletlenül megrendelni.
+          </div>
+          <div id="welcome-banner-sub" style="font-size:0.82rem;color:var(--text-muted);">
+            A példák jelenleg <strong>Budapest</strong> környékére és <strong>Android okostelefonra</strong> vannak hangolva.
+          </div>
+        </div>
+        <div class="action-row">
+          <button class="btn" onclick="toggleSettingsDrawer()">📍 Város / Készülék módosítása</button>
+          <button id="btn-read-current" class="btn btn-secondary" onclick="readCurrentSectionAloud()">
+            <span id="read-btn-label">🔊 Oldal felolvasása</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- 1. KEZDŐLAP ÉS HELYI MAGYAR PÉLDÁK -->
+      <section id="sec-home" class="app-section">
+        <div class="card card-highlight">
+          <span class="badge">1. fejezet • Alapok és Helyi Magyar Tudástár</span>
+          <h2>Mi az a Mesterséges Intelligencia (AI), és hogyan segít a magyar hétköznapokban?</h2>
+          <p>
+            Képzeljen el egy <strong>végtelenül türelmes, udvarias könyvtárost vagy segítőkész szomszédot</strong>, aki a nap 24 órájában ráér, kiválóan tud magyarul, ismeri a hazai szokásokat, sosem siettet, és nem néz furcsán, ha valamit háromszor kérdezünk meg tőle.
+          </p>
+
+          <h3>🇭🇺 Az Ön településére szabott azonnali példák</h3>
+          <div id="local-city-cards" class="grid-3"></div>
+
+          <h3 style="margin-top:1.5rem;">📚 Érintse meg a kívánt mindennapi témakört:</h3>
+          <div class="grid-3">
+            <button class="btn" style="justify-content:flex-start;text-align:left;padding:0.9rem;" onclick="switchSection('health')">🩺 2. Egészség és EESZT Leletek</button>
+            <button class="btn" style="justify-content:flex-start;text-align:left;padding:0.9rem;" onclick="switchSection('kitchen')">🍲 3. Konyha, Kert és Otthon</button>
+            <button class="btn" style="justify-content:flex-start;text-align:left;padding:0.9rem;" onclick="switchSection('admin')">✉️ 4. Magyar Ügyintézés (MVM)</button>
+            <button class="btn" style="justify-content:flex-start;text-align:left;padding:0.9rem;" onclick="switchSection('safety')">🛡️ 5. Csalásszűrő (Bank / Posta)</button>
+            <button class="btn" style="justify-content:flex-start;text-align:left;padding:0.9rem;" onclick="switchSection('leisure')">👨‍👩‍👧‍👦 6. Család, Mese &amp; 65+ Utazás</button>
+            <button class="btn btn-primary" style="justify-content:flex-start;text-align:left;padding:0.9rem;" onclick="switchSection('simulator')">💬 7. Gyakorló &amp; Élő AI Szoba</button>
+          </div>
+
+          <div class="grid-2" style="margin-top:1.25rem;">
+            <div class="card">
+              <h3>🌟 A jó kérdezés 3 aranyszabálya</h3>
+              <ol>
+                <li><strong>Írjon teljes mondatokban</strong>, mintha egy segítőkész ismerősnek írna!</li>
+                <li><strong>Mondja el a saját élethelyzetét</strong> (pl. „Két főre főzök, a férjem cukorbeteg”).</li>
+                <li><strong>Bátran kérdezzen vissza:</strong> „Magyarázd el egyszerűbben, orvosi szakszavak nélkül!”</li>
+              </ol>
+            </div>
+            <div class="card">
+              <h3>🛑 A 3 biztonsági fék Magyarországon</h3>
+              <ul>
+                <li><strong>Soha ne adjon meg titkos adatot:</strong> TAJ-számot, bankkártyaszámot, Ügyfélkapu+ vagy netbanki jelszót!</li>
+                <li><strong>Nem helyettesíti a háziorvost:</strong> az EESZT leletet segít megérteni, de a kezelést az orvos dönti el.</li>
+                <li><strong>Ellenőrizze a hivatalos adatokat:</strong> MÁV menetrendet vagy kormányablakos határidőt mindig ellenőrizzen.</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- 2. EGÉSZSÉG -->
+      <section id="sec-health" class="app-section hidden">
+        <div class="card card-highlight">
+          <span class="badge">2. fejezet • Egészség, EESZT leletek és jóllét</span>
+          <h2>🩺 EESZT orvosi leletek értelmezése és kímélő torna</h2>
+          <div class="grid-3" style="margin-bottom:1rem;">
+            <div>
+              <label for="health-topic"><strong>1. Miben kér segítséget?</strong></label>
+              <select id="health-topic" class="form-control" onchange="updateHealthBuilder()">
+                <option value="lelet">EESZT orvosi lelet szavainak elmagyarázása</option>
+                <option value="vizit">Kérdések összeírása az orvosi vizitre</option>
+                <option value="torna">Ízületkímélő, széken ülve végezhető torna</option>
+                <option value="etrend">Gyomorkímélő / diabéteszes magyaros étrend</option>
+              </select>
+            </div>
+            <div>
+              <label for="health-detail"><strong>2. Konkrét kifejezés vagy panasz:</strong></label>
+              <input id="health-detail" class="form-control" type="text" value="enyhe hypertonia, emelkedett LDL-koleszterin" oninput="updateHealthBuilder()" />
+            </div>
+            <div>
+              <label for="health-style"><strong>3. Hogyan válaszoljon?</strong></label>
+              <select id="health-style" class="form-control" onchange="updateHealthBuilder()">
+                <option value="Nyugtató, közérthető magyar nyelven, pontokba szedve">Közérthetően, pontokba szedve</option>
+                <option value="Nagyon röviden, maximum 4 mondatban">Nagyon röviden (max. 4 mondat)</option>
+              </select>
+            </div>
+          </div>
+          <div class="prompt-preview">
+            <p id="health-generated-prompt" style="margin:0 0 0.75rem 0;font-weight:600;"></p>
+            <div class="action-row">
+              <button class="btn btn-primary" onclick="openInSimulator(document.getElementById('health-generated-prompt').innerText)">▶ Kipróbálom itt (Szimulátor / Élő AI)</button>
+              <button class="btn btn-secondary" onclick="openExternalChatGPT(document.getElementById('health-generated-prompt').innerText)">🚀 Megnyitás ChatGPT-ben</button>
+              <button class="btn" onclick="copyText(document.getElementById('health-generated-prompt').innerText)">📋 Másolás</button>
+            </div>
+          </div>
+        </div>
+        <div id="health-templates-grid" class="grid-3" style="margin-top:1.25rem;"></div>
+      </section>
+
+      <!-- 3. KONYHA ÉS KERT -->
+      <section id="sec-kitchen" class="app-section hidden">
+        <div class="card card-highlight">
+          <span class="badge">3. fejezet • Konyha, Kert és Háztartás</span>
+          <h2>🍲 „Mi van a hűtőben?” Magyaros Receptvarázsló</h2>
+          <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:0.5rem;margin-bottom:1rem;">
+            <button class="btn btn-primary" onclick="toggleIngredient(this, 'krumpli')">✓ Krumpli</button>
+            <button class="btn btn-primary" onclick="toggleIngredient(this, 'tejföl')">✓ Tejföl</button>
+            <button class="btn btn-primary" onclick="toggleIngredient(this, 'tojás')">✓ Tojás</button>
+            <button class="btn btn-primary" onclick="toggleIngredient(this, 'vöröshagyma')">✓ Vöröshagyma</button>
+            <button class="btn" onclick="toggleIngredient(this, 'csirkemell')">Csirkemell</button>
+            <button class="btn" onclick="toggleIngredient(this, 'sárgarépa')">Sárgarépa</button>
+            <button class="btn" onclick="toggleIngredient(this, 'rizs')">Rizs</button>
+            <button class="btn" onclick="toggleIngredient(this, 'túró')">Túró</button>
+          </div>
+          <div class="grid-2" style="margin-bottom:1rem;">
+            <div>
+              <label for="fridge-diet"><strong>Milyen legyen az étel?</strong></label>
+              <select id="fridge-diet" class="form-control" onchange="updateFridgePrompt()">
+                <option value="egyszerű, házias magyaros, olcsó és 30 perc alatt elkészíthető">Házias, olcsó és gyors (30 perces)</option>
+                <option value="gyomorkímélő, kevés zsiradékkal készülő">Gyomorkímélő, könnyű</option>
+                <option value="cukorbetegek számára is biztonságos">Cukorbeteg-barát</option>
+              </select>
+            </div>
+            <div>
+              <label for="fridge-portions"><strong>Hány személyre?</strong></label>
+              <select id="fridge-portions" class="form-control" onchange="updateFridgePrompt()">
+                <option value="2 személyre">2 személyre</option>
+                <option value="1 személyre">1 személyre</option>
+                <option value="4 személyre">4 személyre</option>
+              </select>
+            </div>
+          </div>
+          <div class="prompt-preview">
+            <p id="fridge-generated-prompt" style="margin:0 0 0.75rem 0;font-weight:600;"></p>
+            <div class="action-row">
+              <button class="btn btn-primary" onclick="openInSimulator(document.getElementById('fridge-generated-prompt').innerText)">▶ Recept elkészítése</button>
+              <button class="btn btn-secondary" onclick="openExternalChatGPT(document.getElementById('fridge-generated-prompt').innerText)">🚀 Megnyitás ChatGPT-ben</button>
+              <button class="btn" onclick="copyText(document.getElementById('fridge-generated-prompt').innerText)">📋 Másolás</button>
+            </div>
+          </div>
+        </div>
+        <div id="kitchen-templates-grid" class="grid-3" style="margin-top:1.25rem;"></div>
+      </section>
+
+      <!-- 4. ÜGYINTÉZÉS -->
+      <section id="sec-admin" class="app-section hidden">
+        <div class="card card-highlight">
+          <span class="badge">4. fejezet • Hazai Ügyintézés (MVM, Önkormányzat, MÁK)</span>
+          <h2>✉️ Magyar Hivatalos Levélíró</h2>
+          <div class="grid-3" style="margin-bottom:1rem;">
+            <div>
+              <label for="letter-type"><strong>1. Címzett:</strong></label>
+              <select id="letter-type" class="form-control" onchange="updateLetterBuilder()">
+                <option value="szamla">MVM Next / Vízművek számlareklamáció</option>
+                <option value="onkormanyzat">Helyi Önkormányzat</option>
+                <option value="garancia">Üzlet – Garanciális csere</option>
+                <option value="koszonto">Családi születésnapi köszöntő</option>
+              </select>
+            </div>
+            <div>
+              <label for="letter-tone"><strong>2. Hangnem:</strong></label>
+              <select id="letter-tone" class="form-control" onchange="updateLetterBuilder()">
+                <option value="udvarias, de határozott és hivatalos magyar">Udvarias, de határozott</option>
+                <option value="melegszívű, szeretetteljes">Melegszívű, családias</option>
+              </select>
+            </div>
+            <div>
+              <label for="letter-note"><strong>3. Mi történt röviden?</strong></label>
+              <input id="letter-note" class="form-control" type="text" value="A szokásos havi 8.000 Ft helyett 42.000 Ft-os számla érkezett." oninput="updateLetterBuilder()" />
+            </div>
+          </div>
+          <div class="prompt-preview">
+            <p id="letter-generated-prompt" style="margin:0 0 0.75rem 0;font-weight:600;"></p>
+            <div class="action-row">
+              <button class="btn btn-primary" onclick="openInSimulator(document.getElementById('letter-generated-prompt').innerText)">▶ Levél megíratása</button>
+              <button class="btn btn-secondary" onclick="openExternalChatGPT(document.getElementById('letter-generated-prompt').innerText)">🚀 Megnyitás ChatGPT-ben</button>
+              <button class="btn" onclick="copyText(document.getElementById('letter-generated-prompt').innerText)">📋 Másolás</button>
+            </div>
+          </div>
+        </div>
+        <div id="admin-templates-grid" class="grid-3" style="margin-top:1.25rem;"></div>
+      </section>
+
+      <!-- 5. CSALÁSSZŰRŐ -->
+      <section id="sec-safety" class="app-section hidden">
+        <div class="card card-highlight">
+          <span class="badge">5. fejezet • Hazai Csalásszűrő (Magyar Posta, MVM, OTP/MBH)</span>
+          <h2>🛡️ Interaktív Magyar Csalás-Detektív</h2>
+          <div id="scam-tabs" class="action-row" style="margin-bottom:1rem;"></div>
+          <div class="prompt-preview">
+            <div id="scam-sender" style="font-size:0.8rem;font-weight:700;color:var(--text-muted);"></div>
+            <p id="scam-message" style="font-size:1.05rem;font-weight:600;"></p>
+            <div class="action-row">
+              <button class="btn btn-danger" onclick="answerScamQuiz('scam')">🚨 Ez CSALÁS!</button>
+              <button class="btn btn-success" onclick="answerScamQuiz('safe')">✅ Valódi, biztonságos</button>
+              <button class="btn" onclick="analyzeScamInSimulator()">🤖 Elemzés a Gyakorlóban / Élő AI-ban</button>
+            </div>
+            <div id="scam-explanation" class="card hidden" style="margin-top:1rem;"></div>
+          </div>
+        </div>
+        <div id="safety-templates-grid" class="grid-3" style="margin-top:1.25rem;"></div>
+      </section>
+
+      <!-- 6. CSALÁD ÉS MESE -->
+      <section id="sec-leisure" class="app-section hidden">
+        <div class="card card-highlight">
+          <span class="badge">6. fejezet • Szabadidő, Unoka-Mesegyár és 65+ Utazás</span>
+          <h2>📖 Interaktív „Unoka-Mesegyár”</h2>
+          <div class="grid-3" style="margin-bottom:1rem;">
+            <div>
+              <label for="story-name"><strong>1. Unoka neve és kora:</strong></label>
+              <input id="story-name" class="form-control" type="text" value="Bence, 5 éves" oninput="updateStoryBuilder()" />
+            </div>
+            <div>
+              <label for="story-hero"><strong>2. Kedvenc állata / játéka:</strong></label>
+              <input id="story-hero" class="form-control" type="text" value="egy kis piros tűzoltóautó és egy kiskutya" oninput="updateStoryBuilder()" />
+            </div>
+            <div>
+              <label for="story-lesson"><strong>3. Mese tanulsága:</strong></label>
+              <select id="story-lesson" class="form-control" onchange="updateStoryBuilder()">
+                <option value="a barátságról és segítségnyújtásról">Barátságról és segítségnyújtásról</option>
+                <option value="az esti fogmosásról és elalvásról">Esti fogmosásról és elalvásról</option>
+              </select>
+            </div>
+          </div>
+          <div class="prompt-preview">
+            <p id="story-generated-prompt" style="margin:0 0 0.75rem 0;font-weight:600;"></p>
+            <div class="action-row">
+              <button class="btn btn-primary" onclick="openInSimulator(document.getElementById('story-generated-prompt').innerText)">▶ Mese megírása</button>
+              <button class="btn btn-secondary" onclick="openExternalChatGPT(document.getElementById('story-generated-prompt').innerText)">🚀 Megnyitás ChatGPT-ben</button>
+              <button class="btn" onclick="copyText(document.getElementById('story-generated-prompt').innerText)">📋 Másolás</button>
+            </div>
+          </div>
+        </div>
+        <div id="leisure-templates-grid" class="grid-3" style="margin-top:1.25rem;"></div>
+      </section>
+
+      <!-- 7. GYAKORLÓ ÉS ÉLŐ AI SZOBA -->
+      <section id="sec-simulator" class="app-section hidden">
+        <div class="card card-highlight">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:0.75rem;">
+            <div>
+              <span class="badge">7. fejezet • Gyakorló-Szimulátor + Valódi Élő AI</span>
+              <h2 style="margin:0.35rem 0;">💬 Beszélgetés az OkosTárssal</h2>
+            </div>
+            <div class="action-row">
+              <button class="btn btn-primary" onclick="toggleSettingsDrawer()">⚡ Valódi AI kulcs beállítása</button>
+              <button class="btn btn-secondary" onclick="resetSimulatorWithWelcome()">🔄 Új beszélgetés</button>
+            </div>
+          </div>
+
+          <div class="grid-3" style="margin:1rem 0;">
+            <button class="btn" onclick="sendSimulatorPreset('health_lelet')">🩺 EESZT lelet lefordítása</button>
+            <button class="btn" onclick="sendSimulatorPreset('kitchen_recipe')">🍲 Krumplis recept</button>
+            <button class="btn" onclick="sendSimulatorPreset('admin_complaint')">✉️ MVM számlareklamáció</button>
+            <button class="btn" onclick="sendSimulatorPreset('safety_sms')">🛡️ Magyar Posta SMS ellenőrzése</button>
+            <button class="btn" onclick="sendSimulatorPreset('local_trip')">🚂 65+ kirándulás a városomból</button>
+          </div>
+
+          <div id="sim-chat-log" class="chat-log" aria-live="polite"></div>
+
+          <div class="action-row" style="margin-top:0.85rem;">
+            <button class="btn btn-secondary" onclick="sendSimulatorFollowup('Kérlek, fogalmazd át még egyszerűbben, rövidebb mondatokkal!')">„Mondd még egyszerűbben!”</button>
+            <button class="btn btn-secondary" onclick="sendSimulatorFollowup('Írj még 3 konkrét gyakorlati tanácsot ehhez magyarországi viszonyokra!')">„Adj még 3 hazai jó tanácsot!”</button>
+          </div>
+
+          <div style="margin-top:0.85rem;display:grid;gap:0.5rem;">
+            <textarea id="sim-user-input" class="form-control" rows="3" placeholder="Írja ide a kérdését magyarul, vagy bökjön a Diktálás gombra..."></textarea>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.5rem;">
+              <button id="btn-sim-voice" class="btn btn-secondary" onclick="startSimulatedOrRealVoice()">🎙️ Diktálás</button>
+              <button id="btn-sim-send" class="btn btn-primary" onclick="handleSimulatorSubmit()">Küldés ➤</button>
+            </div>
+          </div>
+
+          <div class="action-row" style="margin-top:0.75rem;">
+            <button class="btn btn-secondary" onclick="openExternalChatGPT(document.getElementById('sim-user-input').value || lastUserQuestion)">🚀 Kérdés megnyitása valódi ChatGPT-ben</button>
+            <button class="btn" onclick="openExternalGemini(document.getElementById('sim-user-input').value || lastUserQuestion)">✨ Másolás és Google Gemini megnyitása</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- 8. KÉSZÜLÉKRE SZABOTT ÚTMUTATÓ ÉS PUSKA -->
+      <section id="sec-realtools" class="app-section hidden">
+        <div class="card card-highlight">
+          <div style="display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+            <div>
+              <span class="badge">8. fejezet • Saját Készülék Útmutató és Konyhai Puska</span>
+              <h2>📱 Hogyan használja a saját készülékén?</h2>
+            </div>
+            <button class="btn btn-primary no-print" onclick="window.print()">🖨️ Oldal kinyomtatása „Puskának”</button>
+          </div>
+
+          <div class="action-row no-print" style="margin:1rem 0;">
+            <button id="dev-tab-android" class="btn btn-primary" onclick="selectDeviceGuide('android')">📱 Android telefon / tablet</button>
+            <button id="dev-tab-iphone" class="btn" onclick="selectDeviceGuide('iphone')">🍏 iPhone / iPad</button>
+            <button id="dev-tab-windows" class="btn" onclick="selectDeviceGuide('windows')">💻 Windows Számítógép</button>
+          </div>
+
+          <div id="device-specific-guide" style="margin-top:1rem;"></div>
+        </div>
+      </section>
+
+    </main>
+
+    <!-- Mobilos Alsó Hüvelykujj-Menü (Bottom Tab Bar) -->
+    <nav id="mobile-bottom-nav" class="mobile-bottom-nav no-print" aria-label="Mobil alsó gyorsmenü">
+      <div class="mobile-bottom-grid">
+        <button id="mnav-home" class="mnav-btn active" onclick="switchSection('home')">
+          <span style="font-size:1.2rem;">🏠</span>
+          <span>Alapok</span>
+        </button>
+        <button id="mnav-topics" class="mnav-btn" onclick="toggleMobileChapterDrawer()">
+          <span style="font-size:1.2rem;">📚</span>
+          <span>Témák (8)</span>
+        </button>
+        <button id="mnav-simulator" class="mnav-btn" onclick="switchSection('simulator')">
+          <span style="font-size:1.2rem;">💬</span>
+          <span>AI Szoba</span>
+        </button>
+        <button id="mnav-realtools" class="mnav-btn" onclick="switchSection('realtools')">
+          <span style="font-size:1.2rem;">📱</span>
+          <span>Puska</span>
+        </button>
+      </div>
+    </nav>
+
+    <footer class="site-footer no-print">
+      <div class="container">
+        OkosTárs 60+ • Mobilra és asztali gépre optimalizált, magyarországi élethelyzetekre lokalizált oktató és valódi AI segédlet
+      </div>
+    </footer>
+
+  </div>
+
+  <script src="app.js"></script>
+</body>
+</html>
